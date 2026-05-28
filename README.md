@@ -255,12 +255,23 @@ java -cp .:../escampeobf.jar escampe.Solo escampe.MonJoueur escampe.MonJoueur
 
 ### ETAPE 5 — Tester en reseau contre JoueurAleatoire
 
+**Option 1 : Lancement automatisé via PowerShell (Recommandé sur Windows)**
+Un script a été créé pour lancer le serveur et les deux clients en arrière-plan avec une seule commande.
+```powershell
+# Depuis le dossier ICHOU_EFFAT/
+powershell -ExecutionPolicy Bypass -File .\run_test.ps1
+
+# Suivre les logs de l'arbitre en temps réel :
+Get-Content serveur.log -Wait
+```
+
+**Option 2 : Lancement manuel (3 terminaux)**
 ```bash
 # Terminal 1
 java -cp escampeobf.jar escampe.ServeurJeu 1234 1
 
 # Terminal 2 — votre IA
-java -cp src:escampeobf.jar escampe.ClientJeu escampe.MonJoueur localhost 1234
+java -cp IchouEffat.jar escampe.ClientJeu escampe.MonJoueur localhost 1234
 
 # Terminal 3 — adversaire aleatoire
 java -cp escampeobf.jar escampe.ClientJeu escampe.JoueurAleatoire localhost 1234
