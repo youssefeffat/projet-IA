@@ -22,6 +22,7 @@ public class EscampeBoard implements Partie1 {
     // ─── Plateau char[][] pour l'heuristique ──────────────────────────────
     // Synchronisé depuis moteur.c() après chaque play().
     private char[][] board = new char[6][6];
+    private java.util.List<String[]> history = new java.util.ArrayList<>();
 
     private static final int[][] LISERES = {
         {1, 2, 2, 3, 1, 2},
@@ -156,6 +157,7 @@ public class EscampeBoard implements Partie1 {
         }
         // Pour le placement (/), dernierLisere reste 0 (pas de contrainte)
 
+        history.add(new String[]{move, player});
         syncBoard();
     }
 
@@ -232,50 +234,10 @@ public class EscampeBoard implements Partie1 {
      */
     public EscampeBoard deepCopy() {
         EscampeBoard copy = new EscampeBoard();
-        // Copier l'état du moteur via réflexion sur le champ j (plateau interne)
-        try {
-            java.lang.reflect.Field jField = escampe.g.class.getDeclaredField("j");
-            jField.setAccessible(true);
-            int[][] srcJ = (int[][]) jField.get(moteur);
-            int[][] dstJ = new int[6][6];
-            for (int r = 0; r < 6; r++) dstJ[r] = srcJ[r].clone();
-            jField.set(copy.moteur, dstJ);
-
-            // Copier les autres champs d'état
-            java.lang.reflect.Field mField = escampe.g.class.getDeclaredField("m");
-            mField.setAccessible(true);
-            mField.set(copy.moteur, mField.get(moteur));
-
-            java.lang.reflect.Field nField = escampe.g.class.getDeclaredField("n");
-            nField.setAccessible(true);
-            nField.set(copy.moteur, nField.get(moteur));
-
-            java.lang.reflect.Field qField = escampe.g.class.getDeclaredField("q");
-            qField.setAccessible(true);
-            qField.set(copy.moteur, qField.get(moteur));
-
-            java.lang.reflect.Field pField = escampe.g.class.getDeclaredField("p");
-            pField.setAccessible(true);
-            pField.set(copy.moteur, pField.get(moteur));
-
-            // Copier le tableau k (positions des pièces par joueur)
-            java.lang.reflect.Field kField = escampe.g.class.getDeclaredField("k");
-            kField.setAccessible(true);
-            escampe.f[][] srcK = (escampe.f[][]) kField.get(moteur);
-            escampe.f[][] dstK = new escampe.f[2][6];
-            for (int i = 0; i < 2; i++) dstK[i] = srcK[i].clone();
-            kField.set(copy.moteur, dstK);
-
-        } catch (Exception e) {
-            // Fallback : copie uniquement le board char[][]
-            System.err.println("[WARN] deepCopy réflexion échouée: " + e.getMessage());
-            for (int r = 0; r < 6; r++) copy.board[r] = board[r].clone();
-            copy.dernierLisere = this.dernierLisere;
-            return copy;
+        // Rejouer l'historique depuis le début pour garantir un état parfait
+        for (String[] record : this.history) {
+            copy.play(record[0], record[1]);
         }
-
-        copy.dernierLisere = this.dernierLisere;
-        copy.syncBoard();
         return copy;
     }
 }

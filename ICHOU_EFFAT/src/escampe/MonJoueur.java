@@ -80,8 +80,8 @@ public class MonJoueur implements e {
         long tempsEcoule  = System.currentTimeMillis() - tempsDebutPartie;
         long tempsRestant = TEMPS_TOTAL_MS - tempsEcoule;
         if (tempsRestant <= 0) {
-            jouerSurPlateauInterne("PASSE");
-            return "PASSE";
+            jouerSurPlateauInterne("E");
+            return "E";
         }
 
         long deadline = System.currentTimeMillis() + Math.min(tempsRestant, BUDGET_COUP_MS);
@@ -167,11 +167,11 @@ public class MonJoueur implements e {
     private String chercherMeilleurCoup(long deadline) {
         String[] coups = plateau.possiblesMoves(maCouleurStr);
 
-        if (coups.length == 0)                              return "PASSE";
-        if (coups.length == 1 && "E".equals(coups[0]))     return "PASSE";
+        if (coups.length == 0)                              return "E";
+        if (coups.length == 1 && "E".equals(coups[0]))      return "E";
         if (coups.length == 1)                              return coups[0];
 
-        String meilleurCoup = "E".equals(coups[0]) ? "PASSE" : coups[0];
+        String meilleurCoup = "E".equals(coups[0]) ? "E" : coups[0];
 
         for (int prof = 1; prof <= 10; prof++) {
             if (System.currentTimeMillis() >= deadline - 50) break;

@@ -277,7 +277,14 @@ Résultats observés lors du test `escampe.Solo escampe.MonJoueur escampe.MonJou
 
 ### 6.3 Test réseau vs JoueurAleatoire
 
-Partie lancée en mode `ClientJeu` contre `JoueurAleatoire` sur `localhost:1234`. Notre IA (IchouEffat) s'est correctement connectée en tant que Noir, a effectué son placement, et a joué des coups calculés par Alpha-Bêta. Le protocole réseau (messages `JOUEUR`, `MOUVEMENT`, `FIN!`) est géré par `ClientJeu` du JAR sans aucune modification de notre côté.
+Partie lancée en mode `ClientJeu` contre `JoueurAleatoire` sur `localhost:1234`. Notre IA (IchouEffat) s'est correctement connectée en tant que Noir, a effectué son placement, et a joué des coups calculés par Alpha-Bêta.
+Le protocole réseau (messages `JOUEUR`, `MOUVEMENT`, `FIN!`) est géré par `ClientJeu`. Lors de notre test final complet (5 minutes), l'IA a maintenu une profondeur de 7 à 10, a géré les cas de passage forcé sans erreur `ILLEGAL-MOVE`, et a remporté la partie par capture de la licorne adverse (`[REGLES] NOIR GAGNE. RAISON: FAIR-PLAY`).
+
+| Test | Résultat |
+|------|---------|
+| Mode Solo | ✅ Fonctionne |
+| Réseau - Placement | ✅ Accepté |
+| Réseau - Coups complets (Alpha-Beta) | ✅ Victoire validée par l'arbitre |
 
 ---
 
@@ -298,6 +305,10 @@ Le protocole réseau utilise `"PASSE"` mais notre logique interne utilise `"E"`.
 ### 7.4 Évaluation de victoire dans l'arbre
 
 `gameOver()` retourne `true` sans préciser le vainqueur. La correction consiste à évaluer le résultat directement après `copie.play()` : si le nœud maximisant (notre tour) a déclenché `gameOver`, c'est une victoire (+100 000) ; si le nœud minimisant l'a déclenché, c'est une défaite (−100 000).
+
+### 7.5 Désynchronisation et copie du plateau (`deepCopy`)
+
+La génération de coups s'appuyant sur le moteur interne de l'arbitre (`escampe.g`), la copie profonde du plateau pour l'arbre Alpha-Bêta s'est avérée complexe. Une première approche par réflexion Java s'est révélée instable. Nous avons opté pour une approche par **historique des coups** : chaque `EscampeBoard` maintient une `List<String[]>` des coups joués et de leur auteur. Lors d'un `deepCopy()`, un nouveau plateau est créé et rejoue l'historique complet. Cela garantit une synchronisation absolue avec les règles de l'arbitre et résout les problèmes de `ILLEGAL-MOVE` ou `ArrayIndexOutOfBoundsException` causés par des désynchronisations réseau (notamment l'absence d'information sur le placement adverse via `mouvementEnnemi`).
 
 ---
 
