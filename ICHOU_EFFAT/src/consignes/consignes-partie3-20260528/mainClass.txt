@@ -1,0 +1,3 @@
+jar:escampeobf.jar
+clientClass:escampe.ClientJeu
+mainClass:escampe.JoueurAleatoire

@@ -1,3 +1,4 @@
+package escampe;
 /**
  * EscampeBoard — wrapper autour du moteur interne escampe.g du serveur.
  * Toute la logique de validation et de génération des coups est déléguée à g,
