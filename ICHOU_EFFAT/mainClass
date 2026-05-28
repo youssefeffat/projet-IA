@@ -1,0 +1,3 @@
+jar:IchouEffat.jar
+clientClass:escampe.ClientJeu
+mainClass:escampe.MonJoueur
